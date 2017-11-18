@@ -12,12 +12,20 @@ Mat image_color, prev_image;
 vector<Point2f> points;
 int cont=0;
 
+void CallBackFunc(int event, int x, int y, int flags, void* userdata) {
+    if (event == EVENT_LBUTTONDOWN) {
+        points.push_back(Point2f(x, y));
+        cout <<"("<<x<<","<<y<<")"<<endl;
+//        circle(image_color,points[cont],3,Scalar(0,255,0));
+//        cont++;
+    }
+}
+
 int main() {
-    bool refaz = false;
     VideoCapture cap("../videoCurto2.mp4");
 
     Mat next_image, image_new, mask, prevT;
-    vector<Point2f> corners_extra, corners[2], greatCorners[2];
+    vector<Point2f> corners[2], greatCorners[2];
 
     vector<uchar> status;
     vector<float> err;
@@ -25,7 +33,7 @@ int main() {
     TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS,30,0.01);
 
     cap>>prev_image;
-    resize(prev_image, prev_image, Size(600, 500));
+    resize(prev_image, prev_image, Size(640,480));
     image_color = prev_image.clone();
     imshow("janela2", image_color);
 
@@ -36,15 +44,6 @@ int main() {
 
     cvtColor(prev_image, prev_image, COLOR_BGR2GRAY);
 
-    goodFeaturesToTrack(prev_image, corners_extra, 300, 0.01, 20, mask, 3, false, 0.01);
-
-    for (int i = 0; i < corners_extra.size(); i++) {
-        if (corners_extra[i].x >= 200 && corners_extra[i].y >= 150 && corners_extra[i].x <= 400
-            && corners_extra[i].y <= 350) {
-            corners[0].push_back(corners_extra[i]);
-        }
-    }
-
     double dx=0, dy=0, da=0;
     while(1)
     {
@@ -53,32 +52,22 @@ int main() {
             break;
         }
 
-        resize(next_image, next_image, Size(600, 500));
+        cap>>next_image;
+        if(next_image.data==NULL) {
+            break;
+        }
+
+        cap>>next_image;
+        if(next_image.data==NULL) {
+            break;
+        }
+        resize(next_image, next_image, Size(640,480));
 
         image_color = next_image.clone();
 
         cvtColor(next_image, next_image, COLOR_BGR2GRAY);
 
-        if(refaz){
-            corners_extra.clear();
-            corners[0].clear();
-
-            prev_image = image_new.clone();
-            cvtColor(prev_image, prev_image, COLOR_BGR2GRAY);
-
-            goodFeaturesToTrack(prev_image, corners_extra, 300, 0.01, 20, mask, 3, false, 0.01);
-
-            for (int i = 0; i < corners_extra.size(); i++) {
-                if (corners_extra[i].x >= 200 && corners_extra[i].y >= 150 && corners_extra[i].x <= 400
-                    && corners_extra[i].y <= 350) {
-                    corners[0].push_back(corners_extra[i]);
-                }
-            }
-
-            refaz = false;
-        }
-
-//        goodFeaturesToTrack(prev_image, corners[0], 300, 0.01, 20, mask, 3, false, 0.01);
+        goodFeaturesToTrack(prev_image, corners[0], 300, 0.01, 20, mask, 3, false, 0.01);
         calcOpticalFlowPyrLK(prev_image, next_image, corners[0], corners[1], status, err,
                              winSize, 3, termcrit, 0, 0.001);
 
@@ -89,18 +78,16 @@ int main() {
             }
         }
 
-        for(int i=0; i<greatCorners[0].size(); i++)
-        {
-            circle(prev_image,greatCorners[0][i],3,Scalar(255));
-            circle(image_color,greatCorners[1][i],3,Scalar(0,255,0));
-        }
+//        for(int i=0; i<greatCorners[0].size(); i++)
+//        {
+//            circle(prev_image,greatCorners[0][i],3,Scalar(255));
+//            circle(image_color,greatCorners[1][i],3,Scalar(0,255,0));
+//        }
 
         imshow("janela1", prev_image);
         imshow("janela2", image_color);
 
         Mat T = estimateRigidTransform(greatCorners[1], greatCorners[0], false);
-
-        cout<<endl<<T<<endl;
 
         static double soma_dx=0,soma_dy=0,soma_da=0;
 
@@ -108,19 +95,14 @@ int main() {
             T= Mat(Size(3,2),CV_32FC1, Scalar(0));
             T(Range(0,2),Range(0,2))= Mat::eye(2,2,CV_32FC1);
             cout << "Perdeu" << endl;
-            refaz = true;
         }
         else
         {
-//            soma_dx+= T.at<double>(0,2);
-//            soma_dy+= T.at<double>(1,2);
-//            soma_da+= atan2(T.at<double>(1,0), T.at<double>(0,0));
-
-            soma_dx= T.at<double>(0,2);
-            soma_dy= T.at<double>(1,2);
-            soma_da= atan2(T.at<double>(1,0), T.at<double>(0,0));
+            soma_dx+= T.at<double>(0,2);
+            soma_dy+= T.at<double>(1,2);
+            soma_da+= atan2(T.at<double>(1,0), T.at<double>(0,0));
         }
-//        prev_image= next_image.clone();
+        prev_image= next_image.clone();
         prevT= T.clone();
 
         dx= soma_dx;
@@ -154,7 +136,7 @@ int main() {
 
         greatCorners[0].clear();
         greatCorners[1].clear();
-//        corners[0].clear();
+        corners[0].clear();
         corners[1].clear();
     }
 
