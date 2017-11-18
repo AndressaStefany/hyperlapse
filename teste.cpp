@@ -6,9 +6,9 @@ using namespace std;
 using namespace cv;
 
 int main() {
-    VideoCapture cap("../hipo.mp4");
+    VideoCapture cap("media/hipo.mp4");
 
-    Mat image, mask, image_cut, image_color, second_image, second_image_color, prevT;
+    Mat image, mask, image_color, second_image, second_image_color, prevT, image_new;
     vector <Point2f> corners, corners_lim[2], great_corners[2];
 
     vector<uchar> status;
@@ -16,6 +16,7 @@ int main() {
     Size winSize(31,31);
     TermCriteria termcrit(TermCriteria::COUNT|TermCriteria::EPS,30,0.01);
 
+    double dx=0, dy=0, da=0;
     while(1) {
         cap >> image;
         if (image.data == NULL)
@@ -57,7 +58,6 @@ int main() {
         }
 
         imshow("image1", image_color);
-        imshow("image2", second_image_color);
 
         Mat T = estimateRigidTransform(great_corners[1], great_corners[0], false);
 
@@ -90,6 +90,8 @@ int main() {
         T.at<double>(1,2) = dy;
 
         warpAffine(image_color, image_new, T, image_color.size());
+
+        imshow("Hyper", image_new);
 
         //apagar as bordas
         corners.clear();
