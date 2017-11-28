@@ -108,13 +108,61 @@ Muitos métodos já foram desenvolvidos para o cálculo do fluxo óptico, podendo se
 
 Foi utilizado os métodos de Harris-Shi-Tomasi e Lucas Kanade no presente trabalho com o intuito da obtenção dos deslocamentos em $x$,em $y$ e do ângulo de rotação dos frames de um vídeo e, dessa modo, produzir o efeito de hyperlapse no vídeo, através da estabilização dos frames e o aumento de velocidade na exibição de frames por segundo. Esses métodos foram escolhidos pelo fato de poderem serem executados em tempo hábil para uma aplicação de tempo real, diferentemente do Horn e Schunck e do algoritmo de Lai e Vemu-ri, que possuem um custo computacional alto.
 
-INCLUIR O PROBLEMA DE ABERTURA
+O problema de abertura é muito comum nesse processo de rastreamento dos pontos, isso ocorre quando o observador não consegue identificar todos os movimentos presentes na imagem, por exemplo, quando um objeto da imagem está se movendo diagonalmente e o observador só consegue identificar o movimento horizontal. Isso é decorrente de uma janela de pequena abertura para a detecção do deslocamento.
 
 Com relação ao hyperlapse, ele é uma técnica da fotografia que mistura o timelapse com a movimentação da câmera, onde o timelapse é o vídeo acelerado dando o efeito de "lapso de tempo" e a movimentação da câmera utiliza a técnica de varredura de imagem dispondo de um foco na imagem. (entrananet)
 
 \subsection{Metodologia}
 
-Abordar tecnologias e métodos utilizados
+Resumidamente, a estratégia utilizada foi capturar um frame, obter os pontos de bordas fortes através do método de Shi-Tomasi e, após a obtenção desses dados, o frame seguinte é capturado para o rastreamento dos pontos anteriormente obtidos, nessa fase é utilizado o método de Lucas Kanade. Agora, sabe-se a localização dos pontos em dois frames distintos, logo, é possível saber o deslocamento em $x$, $y$ e o ângulo da rotação do segundo frame tendo referência o primeiro frame. E então, o deslocamento e rotação inversos são aplicado à imagem e assim conseguir a estabilização do vídeo.
+
+O trabalho foi desenvolvido utilizando a linguagem C++ e a biblioteca OpenCV. As funções mais importante do algoritmo são: goodFeaturesToTrack(), calcOpticalFlowPyrLK(), estimateRigidTransform() e warpAffine().
+
+\begin{itemize}
+\item goodFeaturesToTrack()
+\end{itemize}
+
+Essa função utiliza o método de Shi-tomase, que por sua vez teve como base o método de de Harris, o qual busca variação no gradiente da imagem. Primeiro, é preciso calcular a intensidade do pixel, o qual é obtido pela seguinte equação:\\
+
+$E(u,v) = \sum_{x,y}w(x,y)[I(x+u, y+v)-I(x,y)]^2$\\
+
+Usando expansão de Taylor,\\
+
+$E(u,v) = \sum{x,y}[I(x,y)+uI_ x+vI_ y-I(x,y)]^2$,\\
+
+expandindo e manipulando se chega a\\
+
+$E(u,v) = \sum_{x,y}u^2I_x^2+2uvI_xI_y+v^2I_y^2$,\\
+
+expressando em matriz temos:\\
+
+$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} (\sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix})$.\\
+
+Criando uma variável M:\\
+
+$M = \sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix}$,\\
+
+a expressão fica:\\
+
+$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} M \begin{bmatrix} u \\ v \end{bmatrix}$.
+
+A matriz M é usada no cálculo para determinar se uma janela contém possivelmente um canto, esse score é calculado através da seguinte equação:\\
+
+$R = min(\lambda_1, \lambda_2)$,\\
+
+onde os $\lambda$ são os autovalores da matriz M.
+
+\begin{itemize}
+\item calcOpticalFlowPyrLK()
+\end{itemize}
+
+\begin{itemize}
+\item estimateRigidTransform()
+\end{itemize}
+
+\begin{itemize}
+\item warpAffine()
+\end{itemize}
 
 \subsection{Agoritmo}
 
