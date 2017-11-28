@@ -1,0 +1,129 @@
+\documentclass[conference,harvard,brazil,english]{sbatex}
+\usepackage[latin1]{inputenc}
+\usepackage{ae}
+%
+% LaTeX2e class SBATeX
+%
+% Versão 1.0 alpha
+%   Walter Fetter Lages
+%   w.fetter@ieee.org
+%
+% Este arquivo cba.tex é uma adaptação do arquivo revista.tex,
+% Versão: 1.0 alpha, desenvolvido por Maurício C. de Oliveira,
+% mcdeoliveira@ieee.org.
+%
+% As adaptações fazem com que, por default, sejam utilizadas
+% as opções adequadas para o formato do CBA ou SBAI, ao contrário do arquivo
+% revista.tex, que, por default, utiliza opções adequadas para o formato
+% da Revista da SBA.
+%
+%
+% --------------------------------------------------
+%
+% Para compilar este exemplo use a seqüência de comandos:
+%
+%     latex cba
+%     bibtex cba
+%     latex cba
+%     latex cba
+%
+% Para gerar um arquivo Postscript (.ps):
+%
+%     dvips -t a4 cba
+%
+% Para gerar um arquivo Portable Document Format (.pdf):
+%
+%     dvips -Ppdf -t a4 cba
+%     ps2pdf -dMaxSubsetPct=100 -dSubsetFonts=true -dEmbedAllFonts=true -dCompatibilityLevel=1.2 -sPAPERSIZE=a4 cba.ps
+%
+
+% --------------------------------------------------
+%  Estes comandos são necessários apenas para a
+%  a geração deste artigo exemplo. Eles não fazem
+%  parte do estilo SBATeX.
+% --------------------------------------------------
+\makeatletter
+\def\verbatim@font{\normalfont\ttfamily\footnotesize}
+\makeatother
+\usepackage{amsmath}
+% --------------------------------------------------
+
+
+\begin{document}
+
+% CABEÇALHO
+
+\title{Uso do Fluxo Óptico para criação do Hyperlapse}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% O processo de revisao do CBA 2014 sera DOUBLE BLIND, portanto NAO inclua
+% autores na versão que será submetida para revisão
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\author{Andressa Stéfany Silva de Oliveira}{astefanysoliveira@gmail.com}
+\address{Graduanda em Engenharia de Computação\\ Universidade do Rio Grande do Norte\\ Natal, RN, Brasil}
+
+\twocolumn[
+
+\maketitle
+
+\selectlanguage{english}
+\begin{abstract}
+  O processo de revisao do CBA 2014 sera DOUBLE BLIND, portanto NAO inclua
+  autores na versão que será submetida para revisão. Leve isso em consideração ao citar seus próprios trabalhos.  \end{abstract}
+
+\keywords{Template, Example.}
+
+\selectlanguage{brazil}
+\begin{abstract}
+  O processo de revisao do CBA 2014 sera DOUBLE BLIND, portanto NAO inclua
+  autores na versão que será submetida para revisão. Leve isso em consideração ao citar seus próprios trabalhos.
+\end{abstract}
+
+\keywords{Exemplo, Ilustração.}
+]
+
+% CONTRIBUIÇÃO
+
+\selectlanguage{brazil}
+
+\section{Introdução}
+O Fluxo Óptico é o campo de estudo que obtém o deslocamento dos pixels de uma imagem, para isso é necessário possuir no mínimo dois frames, ou seja, uma sequência de frames e assim ser possível fazer o rastreamento do pixel. Há inúmeros aplicações, onde algumas são: navegação de robôs móveis, nesse caso o fluxo óptico atuará no rastreio de objetos fazendo com quê o robô não colida em obstáculos presentes no ambiente em que se encontra, outro exemplo é a estabilização de vídeos, como também a recuperação de formas a partir do movimento e compressão de imagens.
+
+FALTA TERMINAR
+
+\subsection{Fluxo Óptico}
+
+O Fluxo Óptico proporciona o rastreamento de pixel de uma determinada imagem com relação a outra imagem pré-conhecida, se faz necessário que tenha no mínimo duas imagens para que isso seja possível, em alguns algoritmos, pois alguns utilizam mais frames no cálculo. Esse movimento poderá surgir a partir da movimentação da câmera ou dos objetos presentes na cena, ademais, supõe-se que o brilho da imagem sofreu uma variância quase imperceptível, ao ponto de não interferir nos algoritmos de rastreamento, observe:\\
+
+$I(x,y,t) = I(x+\Delta x,y+\Delta y,t+\Delta t)$ (1)\\
+
+sendo I é a intensidade do pixel, se o deslocamento for pequeno de um frame para outro $\Delta x$ e $\Delta y$ serão pequenos em um curto espaço de tempo ($\Delta t$), logo o brilho do pixel também não mudará drásticamente. Outro ponto importante é a vizinha do pixel ter sofrido deslocamento similar.
+
+Com a manipulação equação (1): .... talvez mostrar a equação dos vetores (lvelho)
+
+Muitos métodos já foram desenvolvidos para o cálculo do fluxo óptico, podendo ser citados: os agortimos de Horn e Schunck (1981), Lucas e Kanade (1981), Fleet e Jepson (1990), Harris-Shi-Tomasi(1994), Nesi et al. (1995), Grossmann e Santos-Victor (1997) e Lai e Vemuri (1998). (MÁRIO SARCINELLI FILHO)
+
+Foi utilizado os métodos de Harris-Shi-Tomasi e Lucas Kanade no presente trabalho com o intuito da obtenção dos deslocamentos em $x$,em $y$ e do ângulo de rotação dos frames de um vídeo e, dessa modo, produzir o efeito de hyperlapse no vídeo, através da estabilização dos frames e o aumento de velocidade na exibição de frames por segundo. Esses métodos foram escolhidos pelo fato de poderem serem executados em tempo hábil para uma aplicação de tempo real, diferentemente do Horn e Schunck e do algoritmo de Lai e Vemu-ri, que possuem um custo computacional alto.
+
+INCLUIR O PROBLEMA DE ABERTURA
+
+Com relação ao hyperlapse, ele é uma técnica da fotografia que mistura o timelapse com a movimentação da câmera, onde o timelapse é o vídeo acelerado dando o efeito de "lapso de tempo" e a movimentação da câmera utiliza a técnica de varredura de imagem dispondo de um foco na imagem. (entrananet)
+
+\subsection{Metodologia}
+
+Abordar tecnologias e métodos utilizados
+
+\subsection{Agoritmo}
+
+Descrever os passos do Algoritmo
+
+\subsection{Dificuldades}
+
+\subsection{Conclusão}
+
+% BIBLIOGRAFIA
+\bibliography{exemplo}
+\end{document}
