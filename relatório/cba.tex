@@ -262,6 +262,36 @@ $\texttt{dst} (x,y) =  \texttt{src} ( \texttt{M} _{11} x +  \texttt{M} _{12} y +
 
 Também é de grande relevância citar que a estabilização do vídeo é mostrada em tempo real para o usuário, pois assim que o tratamento é feito no frame, ele é exibido. Diferentemente da aceleração, que é feita apenas no vídeo resultante. Esse funcionamento será explicado na próxima seção.
 
+\subsection{Agoritmo}
+
+Nesta seção será mostrado a estrutura do algoritmo desenvolvido.
+
+Primeiro, há a captura de um frame, chamado de \textit{prev\_image}, e sua conversão para tons de cinza. Para efeito de visibilidade final do usuário, \textit{prev\_image} foi clonado antes da transformação da cor, para que a imagem colorida não seja perdida.
+
+\lstinputlisting[language=cpp,caption={Captura do Primeiro Frame}]{code/01.cpp}
+
+Em seguida, o código entra em um loop para o tratamento dos seguintes frames. Calcula-se os pontos de borda for de \textit{prev\_image} (\textit{goodFeaturesToTrack}), o próximo frame é capturado e calculado os correspondentes dos pontos encontrados em \textit{prev\_image} (\textit{calcOpticalFlowPyrLK}). Assim como no primeiro frame, o segundo também é clonado criando a nova imagem \textit{next\_color\_image}.
+
+\lstinputlisting[language=cpp,caption={Início do Loop}]{code/02.cpp}
+
+Observe que existe um loop percorrendo \textit{status}, isso se dá porque a função \textit{calcOpticalFlowPyrLK} retorna \textit{1} nessa variável caso o ponto de borda tenha sido encontrado em \textit{next\_image}, a função desse for é armazenar apenas os pontos que possuiem correspondentes.
+
+Agora que temos as posições dos pontos de ambos os frames capturados, será usado \textit{estimateRigidTransform} para encontrar a transformação afim. Pode ocorrer dessa matriz não se encontrada, nesse caso ela é substituída por uma matrix identidade. Além disso, a função \textit{estimateRigidTransform} encontra o deslocamento e a rotação que ocorre do primeiro pro segundo argumento passado, então, pensando na transformação inversa, foi passado os pontos do segundo frame como primeiro argumento, e os pontos do primeiro frame como segundo argumento, perceba:
+
+\lstinputlisting[language=cpp,caption={Transformação Afim}]{code/03.cpp}
+
+Caso a matriz de transformação seja encontrada, os valores de deslocamento e rotação estão sendo somados a suas respectivas variáveis que estão acumulando o seu valor ao decorrer dos loops, pois esse deslocamento e rotação que está sendo calculado na matriz \textit{T} tem como referência o frame anterior.
+
+\lstinputlisting[language=cpp,caption={Matriz T e Aplicação}]{code/04.cpp}
+
+O trecho acima mostra o cálculo da matriz de transformação com os novos valores acumulados e o uso da função \textit{warpAffine}, a qual modifica a imagem \textit{next\_color\_image}, onde o resultado será retornado em \textit{new\_image}. Ademais, \textit{new\_image} é recortada com o objetivo amenizar o efeito que a estabilização causa nas bordas, além de redimensionada com o tamanho inicial do vídeo.
+
+Por fim, o frame resultante é mostrado em uma janela e gravado em um vídeo, segue as especificações do vídeo, as quais são colocadas no início do código:
+
+\lstinputlisting[language=cpp,caption={Vídeo Acelerado}]{code/05.cpp}
+
+Sendo esse vídeo exibido com 60 frames por segundo.
+
 \subsection{Dificuldades}
 
 \subsection{Conclusão}
