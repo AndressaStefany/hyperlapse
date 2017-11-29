@@ -1,5 +1,9 @@
 \documentclass[conference,harvard,brazil,english]{sbatex}
+\usepackage{url}
 \usepackage[latin1]{inputenc}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{float}
 \usepackage{ae}
 %
 % LaTeX2e class SBATeX
@@ -69,13 +73,6 @@
 
 \maketitle
 
-\selectlanguage{english}
-\begin{abstract}
-  O processo de revisao do CBA 2014 sera DOUBLE BLIND, portanto NAO inclua
-  autores na versão que será submetida para revisão. Leve isso em consideração ao citar seus próprios trabalhos.  \end{abstract}
-
-\keywords{Template, Example.}
-
 \selectlanguage{brazil}
 \begin{abstract}
   O processo de revisao do CBA 2014 sera DOUBLE BLIND, portanto NAO inclua
@@ -114,55 +111,123 @@ Com relação ao hyperlapse, ele é uma técnica da fotografia que mistura o timelap
 
 \subsection{Metodologia}
 
-Resumidamente, a estratégia utilizada foi capturar um frame, obter os pontos de bordas fortes através do método de Shi-Tomasi e, após a obtenção desses dados, o frame seguinte é capturado para o rastreamento dos pontos anteriormente obtidos, nessa fase é utilizado o método de Lucas Kanade. Agora, sabe-se a localização dos pontos em dois frames distintos, logo, é possível saber o deslocamento em $x$, $y$ e o ângulo da rotação do segundo frame tendo referência o primeiro frame. E então, o deslocamento e rotação inversos são aplicado à imagem e assim conseguir a estabilização do vídeo.
+Resumidamente, a estratégia utilizada foi capturar um frame, obter os pontos de bordas fortes através do método de Shi-Tomasi e, após a obtenção desses dados, o frame seguinte é capturado para o rastreamento dos pontos anteriormente obtidos, nessa fase é utilizado o método de Lucas Kanade. Agora, sabe-se a localização dos pontos em dois frames distintos, logo, é possível saber o deslocamento em $x$, $y$ e o ângulo da rotação do segundo frame tendo como referência o primeiro frame. E então, o deslocamento e rotação inversos são aplicado à imagem com o intuito da estabilização do vídeo.
 
-O trabalho foi desenvolvido utilizando a linguagem C++ e a biblioteca OpenCV. As funções mais importante do algoritmo são: goodFeaturesToTrack(), calcOpticalFlowPyrLK(), estimateRigidTransform() e warpAffine().
+O trabalho foi desenvolvido utilizando a linguagem C++ e a biblioteca OpenCV. As funções mais importante do algoritmo são: goodFeaturesToTrack(), calcOpticalFlowPyrLK(), estimateRigidTransform() e warpAffine(). Abaixo está descrito o que cada função faz e o método por trás dela.
 
 \begin{itemize}
 \item goodFeaturesToTrack()
 \end{itemize}
 
-Essa função utiliza o método de Shi-tomase, que por sua vez teve como base o método de de Harris, o qual busca variação no gradiente da imagem. Primeiro, é preciso calcular a intensidade do pixel, o qual é obtido pela seguinte equação:\\
+Essa função utiliza o método de Shi-Tomase, que por sua vez teve como base o método de de Harris, o qual busca variação no gradiente da imagem. Primeiro, é preciso calcular a intensidade do pixel, o qual é obtido pela seguinte equação:
 
-$E(u,v) = \sum_{x,y}w(x,y)[I(x+u, y+v)-I(x,y)]^2$\\
+$E(u,v) = \sum_{x,y}w(x,y)[I(x+u, y+v)-I(x,y)]^2$
 
-Usando expansão de Taylor,\\
+Usando expansão de Taylor,
 
-$E(u,v) = \sum{x,y}[I(x,y)+uI_ x+vI_ y-I(x,y)]^2$,\\
+$E(u,v) = \sum{x,y}[I(x,y)+uI_ x+vI_ y-I(x,y)]^2$,
 
-expandindo e manipulando se chega a\\
+expandindo e manipulando se chega a
 
-$E(u,v) = \sum_{x,y}u^2I_x^2+2uvI_xI_y+v^2I_y^2$,\\
+$E(u,v) = \sum_{x,y}u^2I_x^2+2uvI_xI_y+v^2I_y^2$,
 
-expressando em matriz temos:\\
+expressando em matriz temos:
 
-$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} (\sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix})$.\\
+$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} (\sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix})$.
 
-Criando uma variável M:\\
+Criando uma variável M:
 
-$M = \sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix}$,\\
+$M = \sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix}$,
 
-a expressão fica:\\
+a expressão fica:
 
 $E(u,v) = \begin{bmatrix} u & v \end{bmatrix} M \begin{bmatrix} u \\ v \end{bmatrix}$.
 
-A matriz M é usada no cálculo para determinar se uma janela contém possivelmente um canto, esse score é calculado através da seguinte equação:\\
+A matriz M é usada no cálculo para determinar se uma janela contém possivelmente um canto, esse \textit{score} é calculado através da seguinte equação:\\
 
-$R = min(\lambda_1, \lambda_2)$,\\
+$R = min(\lambda_1, \lambda_2)$,
 
-onde os $\lambda$ são os autovalores da matriz M.
+onde os $\lambda$ são os autovalores da matriz M. Esse valor precisa ser maior que um limiar, um $\lambda_min$. Observe a figura abaixo: %(harris_detector)
+
+\begin{figure}[h]
+	\centering
+		\graphicspath{ {shitomasi} }		
+		\includegraphics[width=7cm]{shitomasi_space.png}
+		\caption{Método Shi-Tomasi}
+		\label{fig:shitomasi}
+		\cite{harvard} %py_shi_tomasi
+\end{figure}
+
+A janela só será considerada um canto quando $\lambda_1$ e $\lambda_2 $ estiverem acima do $\lambda_min$, ou seja, quando estiver na região verde mostrada na figura \ref{fig:shitomasi}.
 
 \begin{itemize}
 \item calcOpticalFlowPyrLK()
 \end{itemize}
 
+Calcula o fluxo óptico para um conjunto de características esparsas usando o método não-iterativo Lucas Kanade, o qual assume que o fluxo é constante em pequenas janeças de tamanho mxm e com m>1. Numerando os pixels de 1 a n chega-se no seguinte conjunto de equações
+\begin{center}
+$I_{x1}V_x+I_{y1}V_y = -I_{t1}$\\
+$I_{x2}V_x+I_{y2}V_y = -I_{t2}$\\
+...\\
+$I_{xn}V_x+I_{yn}V_y = -I_{tn}$\\
+\end{center}
+
+Notação matricial:\\
+
+$\begin{bmatrix} I_{x1} & I_{y1} & I_{z1}\\I_{x2} & I_{y2} & I_{z2}\\ &...& \\ I_{xn} & I_{yn} & I_{zn} \end{bmatrix} \begin{bmatrix} V_x \\ V_y \\ V_z \end{bmatrix} = \begin{bmatrix} -I_{t1}\\-I_{t2}\\...\\-I_{tn} \end{bmatrix}$
+\begin{center} 
+$\Rightarrow A\vec{v}=-b$
+\end{center}
+
+Utilizando o método dos mínimos quadrados para a resolução desse sistema ficamos com\\
+
+$A^T A\vec{v}=A^T(-b)$ ou $\vec{v}=(A^TA)A^T(-b)$\\
+
+E então obtemos\\
+
+$\begin{bmatrix} V_x \\ V_y \end{bmatrix}$ = $\begin{bmatrix} \sum I_{xi}^2 & \sum I_{xi}I_{yi} \\ \sum I_{xi}I_{yi} & \sum I_{yi}^2 \end{bmatrix}^{-1} \begin{bmatrix} -\sum I_{xi}I_{ti} \\ \sum I_{yi}I_{ti} \end{bmatrix}$ (http://webserver2.tecgraf.puc-rio.br)
+
+Um exemplo visual é a figura \ref{fig:image}, é passado como parâmetro a imagem 1, imagem 2 e as bordas da imagem 2, o retorno será as bordas da imagem 2.
+
+\begin{figure}[h]
+	\centering
+		\graphicspath{ {image} }		
+		\includegraphics[width=7cm]{Warp_Affine_Tutorial_Theory_0.jpg}
+		\caption{Lucas Kanade}
+		\label{fig:image}
+		\cite{harvard} %https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/warp_affine/warp_affine.html
+\end{figure}
+
 \begin{itemize}
 \item estimateRigidTransform()
 \end{itemize}
 
+Sendo pré-estabelecido dois vetores de coordenadas de pontos ótimos de borda, essa função retornará um transformação afim, isto é, retornará o deslocamento em $x$, $y$ e $\theta$, como mostrado nas matrizes abaixo:
+
+R(rotação)= $\begin{bmatrix}
+cos(\theta) & -\sin(theta) \\ \sin(\theta) & cos(\theta)
+\end{bmatrix}$
+
+S(escalonamento)= $\begin{bmatrix}
+s & 0 \\ 0 & s
+\end{bmatrix}$
+
+t(translação)= $\begin{bmatrix}
+tx \\ ty
+\end{bmatrix}$\\
+
+A transformação afim fica
+\begin{center}
+$T = [RS|t] = \begin{bmatrix}s*cos(\theta) & -s*sin(\theta) & tx \\ s*sin(\theta) & s*cos(\theta) & ty\end{bmatrix}$
+\end{center}
+(http://nghiaho.com/?p=2208)
 \begin{itemize}
 \item warpAffine()
 \end{itemize}
+
+Basicamente, essa função irá aplicar uma matriz de transformação afim a uma imagem, onde essa essa transformação afim possuirá deslocamento em \textit{x}, em \textit{y}, o escalonamento e a rotação, como mencionado anteriormente. Essa moficação é realizada na imagem através da seguinte equação: 
+
+$\texttt{dst} (x,y) =  \texttt{src} ( \texttt{M} _{11} x +  \texttt{M} _{12} y +  \texttt{M} _{13}, \texttt{M} _{21} x +  \texttt{M} _{22} y +  \texttt{M} _{23})$
 
 \subsection{Agoritmo}
 
