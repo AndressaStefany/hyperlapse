@@ -3,6 +3,7 @@
 \usepackage[latin1]{inputenc}
 \usepackage{graphicx}
 \usepackage{subfig}
+\usepackage[compatibility=false]{caption}
 \usepackage{float}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -109,10 +110,10 @@
 
 \selectlanguage{brazil}
 \begin{abstract}
-  A partir do estudo de Processamento Digital de Imagens, houve utilização das técnicas de Fluxo Óptico para a estabilização de um vídeo e a aceleração deste, onde o objetivo é a criação do efeito hyperlapse em um vídeo, isto é, a ideia de "colapso de tempo". E esses conceitos foram implementados na linguagem C++ utilizando OpenCV.
+  A partir do estudo de Processamento Digital de Imagens, houve utilização das técnicas de Fluxo Óptico para a estabilização de um vídeo e a aceleração deste, onde o objetivo é a criação do efeito hyperlapse em um vídeo, isto é, a ideia de "colapso de tempo". Esses conceitos foram aplicados com a linguagem C++ utilizando a biblioteca OpenCV.
 \end{abstract}
 
-\keywords{Hyperlapse, Processamento de Imagem, Vídeo, Estabilização, Shi-Tomasi, Lucas-Kanade, Transformação Afim.}
+\keywords{Hyperlapse, Processamento de Imagem, Vídeo, Estabilização, Shi-Tomasi, Lucas-Kanade, Transformação Afim, OpenCV.}
 ]
 
 % CONTRIBUIÇÃO
@@ -120,25 +121,29 @@
 \selectlanguage{brazil}
 
 \section{Introdução}
-O Fluxo Óptico é o campo de estudo que obtém o deslocamento dos pixels de uma imagem, para isso é necessário possuir no mínimo dois frames, ou seja, uma sequência de frames e assim ser possível fazer o rastreamento do pixel. Há inúmeros aplicações, onde algumas são: navegação de robôs móveis, nesse caso o fluxo óptico atuará no rastreio de objetos fazendo com quê o robô não colida em obstáculos presentes no ambiente em que se encontra, outro exemplo é a estabilização de vídeos, como também a recuperação de formas a partir do movimento e compressão de imagens.
+Um dos campos do Processamento Digital de Imagens é o Fluxo Óptico, o qual estuda o deslocamento dos pixels de uma sequência de imagens.
 
-FALTA TERMINAR
+Inúmeros estudos e técnicas tem surgido nesse ramo, como também as aplicações, podendo ser citadas: navegação de robôs móveis, nesse caso o fluxo óptico atuará no rastreio de objetos fazendo com quê o robô não colida em obstáculos presentes no ambiente em que se encontra, outro exemplo é a estabilização de vídeos, como também a recuperação de formas a partir do movimento e compressão de imagens.
+
+Neste trabalho será citado algumas técnicas de detecção de pontos de borda, além de explicar um pouco mais a fundo o funcionamento de dois métodos em específico, os quais foram utilizados na aplicação desenvolvida: hyperlapse.
+
+Como também será explicado todo o código e a estratégia utilizada. Posteriormente, é exposto os resultados obtidos.
 
 \subsection{Fluxo Óptico}
 
-O Fluxo Óptico proporciona o rastreamento de pixel de uma determinada imagem com relação a outra imagem pré-conhecida, se faz necessário que tenha no mínimo duas imagens para que isso seja possível, em alguns algoritmos, pois há algoritmos que utilizam mais frames no cálculo. Esse movimento poderá surgir a partir da movimentação da câmera ou dos objetos presentes na cena, ademais, supõe-se que o brilho da imagem sofreu uma variância quase imperceptível, ao ponto de não interferir nos algoritmos de rastreamento, observe:\\
+O Fluxo Óptico proporciona o rastreamento do pixel de uma determinada imagem com relação a outra imagem pré-conhecida, se faz necessário que tenha no mínimo duas imagens para que isso seja possível, em alguns algoritmos, pois há algoritmos que utilizam mais frames no cálculo. Esse movimento poderá surgir a partir da movimentação da câmera ou dos objetos presentes na cena, ademais, supõe-se que o brilho da imagem sofreu uma variância quase imperceptível, ao ponto de não interferir nos algoritmos de rastreamento, observe:\\
 
 $I(x,y,t) = I(x+\Delta x,y+\Delta y,t+\Delta t)$ (1)\\
 
-sendo I é a intensidade do pixel, se o deslocamento for pequeno de um frame para outro $\Delta x$ e $\Delta y$ serão pequenos em um curto espaço de tempo ($\Delta t$), logo o brilho do pixel também não mudará drásticamente. Outro ponto importante é a vizinha do pixel ter sofrido deslocamento similar.
+sendo I a intensidade do pixel, note que, se for pequeno o deslocamento de um frame para outro, $\Delta x$ e $\Delta y$ serão pequenos em um curto espaço de tempo ($\Delta t$), logo o brilho do pixel também não mudará drásticamente \cite{faria}. Outro ponto importante é a vizinha do pixel ter sofrido deslocamento similar.
 
-Muitos métodos já foram desenvolvidos para o cálculo do fluxo óptico, podendo ser citados: os agortimos de Horn e Schunck (1981), Lucas e Kanade (1981), Fleet e Jepson (1990), Harris-Shi-Tomasi(1994), Nesi et al. (1995), Grossmann e Santos-Victor (1997) e Lai e Vemuri (1998). (MÁRIO SARCINELLI FILHO)
+Muitos métodos já foram desenvolvidos para o cálculo do fluxo óptico, podendo ser citados: os agortimos de Horn e Schunck (1981), Lucas e Kanade (1981), Fleet e Jepson (1990), Harris-Shi-Tomasi(1994), Nesi et al. (1995), Grossmann e Santos-Victor (1997) e Lai e Vemuri (1998).
 
-Foi utilizado os métodos de Harris-Shi-Tomasi e Lucas Kanade no presente trabalho com o intuito da obtenção dos deslocamentos em $x$, em $y$ e do ângulo de rotação dos frames de um vídeo e, desse modo, produzir o efeito de hyperlapse no vídeo, através da estabilização dos frames e o aumento de velocidade na exibição de frames por segundo. Esses métodos foram escolhidos pelo fato de poderem serem executados em tempo hábil para uma aplicação de tempo real, diferentemente do Horn e Schunck e do algoritmo de Lai e Vemu-ri, que possuem um custo computacional alto. (pode citar o porquê)
+Foi utilizado os métodos de Shi-Tomasi e Lucas Kanade no presente trabalho com o intuito da obtenção dos deslocamentos em $x$, em $y$ e do ângulo de rotação dos frames de um vídeo e, desse modo, produzir o efeito de hyperlapse no vídeo, através da estabilização dos frames e o aumento de velocidade na exibição de frames por segundo. Esses métodos foram escolhidos pelo fato de poderem ser executados em tempo hábil para uma aplicação de tempo real, diferentemente do algoritmo de Fleet e Jepson, que possuem um custo computacional alto pois é usado muitos quadros simultaneamente \cite{mario}.
 
-Também é importante informar que o problema de abertura é muito comum nesse processo de rastreamento dos pontos, isso ocorre quando o observador não consegue identificar todos os movimentos presentes na imagem, por exemplo, quando um objeto da imagem está se movendo diagonalmente e o observador só consegue identificar o movimento horizontal. Isso é decorrente de uma janela de pequena abertura para a detecção do deslocamento. (slide agostinho)
+Também é importante informar que o problema de abertura é muito comum nesse processo de rastreamento dos pontos, isso ocorre quando o observador não consegue identificar todos os movimentos presentes na imagem, por exemplo, quando um objeto da imagem está se movendo diagonalmente e o observador só consegue identificar o movimento horizontal. Isso é decorrente de uma janela de pequena abertura para a detecção do deslocamento \cite{agostinho}.
 
-Com relação ao hyperlapse, ele é uma técnica da fotografia que mistura o timelapse com a movimentação da câmera, onde o timelapse é o vídeo acelerado dando o efeito de "lapso de tempo" e a movimentação da câmera utiliza a técnica de varredura de imagem dispondo de um foco na imagem. (entrananet)
+Com relação ao hyperlapse, ele é uma técnica da fotografia que mistura o timelapse com a movimentação da câmera, onde o timelapse é o vídeo acelerado dando o efeito de "lapso de tempo" e a movimentação da câmera utiliza a técnica de varredura de imagem dispondo de um foco na imagem \cite{bezerra}.
 
 \subsection{Metodologia}
 
@@ -150,35 +155,35 @@ O trabalho foi desenvolvido utilizando a linguagem C++ e a biblioteca OpenCV. As
 \item goodFeaturesToTrack()
 \end{itemize}
 
-Essa função utiliza o método de Shi-Tomase, que por sua vez teve como base o método de Harris, o qual busca variação no gradiente da imagem. Primeiro, é preciso calcular a intensidade do pixel, o qual é obtido pela seguinte equação:
+Essa função utiliza o método de Shi-Tomasi, que por sua vez teve como base o método de Harris, o qual busca variação no gradiente da imagem. Primeiro, é preciso calcular a intensidade do pixel, o qual é obtido pela seguinte equação:
 
 $E(u,v) = \sum_{x,y}w(x,y)[I(x+u, y+v)-I(x,y)]^2$
 
-Usando expansão de Taylor,
+Usando expansão de Taylor,\\
 
-$E(u,v) = \sum{x,y}[I(x,y)+uI_ x+vI_ y-I(x,y)]^2$,
+$E(u,v) = \sum{x,y}[I(x,y)+uI_ x+vI_ y-I(x,y)]^2$,\\
 
-expandindo e manipulando se chega a
+expandindo e manipulando se chega a\\
 
-$E(u,v) = \sum_{x,y}u^2I_x^2+2uvI_xI_y+v^2I_y^2$,
+$E(u,v) = \sum_{x,y}u^2I_x^2+2uvI_xI_y+v^2I_y^2$,\\
 
 expressando em matriz temos:
 
-$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} (\sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix})$.
+$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} (\sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix})$.\\
 
 Criando uma variável M:
 
-$M = \sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix}$,
+$M = \sum_{x,y}w(x,y)\begin{bmatrix} I_x^2 & I_xI_y \\ I_xI_y & I_y^2 \end{bmatrix}$,\\
 
 a expressão fica:
 
-$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} M \begin{bmatrix} u \\ v \end{bmatrix}$.
+$E(u,v) = \begin{bmatrix} u & v \end{bmatrix} M \begin{bmatrix} u \\ v \end{bmatrix}$.\\
 
-A matriz M é usada no cálculo para determinar se uma janela contém possivelmente um canto, esse \textit{score} é calculado através da seguinte equação:\\
-
+A matriz M é usada no cálculo para determinar se uma janela contém possivelmente um canto, esse \textit{score} é calculado através da seguinte equação:
+\begin{center}
 $R = min(\lambda_1, \lambda_2)$,
-
-onde os $\lambda$ são os autovalores da matriz M. Esse valor precisa ser maior que um limiar, um $\lambda_{min}$. Observe a figura abaixo: %(harris_detector)
+\end{center}
+onde os $\lambda$ são os autovalores da matriz M. Esse valor precisa ser maior que um limiar, um $\lambda_{min}$ \cite{harris}. Observe a figura abaixo:
 
 \begin{figure}[h]
 	\centering
@@ -186,7 +191,6 @@ onde os $\lambda$ são os autovalores da matriz M. Esse valor precisa ser maior q
 		\includegraphics[width=7cm]{images/shitomasi_space.png}
 		\caption{Método Shi-Tomasi}
 		\label{fig:shitomasi}
-		\cite{harvard} %py_shi_tomasi
 \end{figure}
 
 A janela só será considerada um canto quando $\lambda_1$ e $\lambda_2 $ estiverem acima do $\lambda_{min}$, ou seja, quando estiver na região verde mostrada na figura \ref{fig:shitomasi}.
@@ -195,7 +199,7 @@ A janela só será considerada um canto quando $\lambda_1$ e $\lambda_2 $ estivere
 \item calcOpticalFlowPyrLK()
 \end{itemize}
 
-Calcula o fluxo óptico para um conjunto de características esparsas usando o método não-iterativo Lucas Kanade, o qual assume que o fluxo é constante em pequenas janelas de tamanho $m$ $x$ $m$ e com $m>1$. Numerando os pixels de 1 a n chega-se no seguinte conjunto de equações
+Calcula o fluxo óptico para um conjunto de características esparsas usando o método não-iterativo Lucas Kanade, o qual assume que o fluxo é constante em pequenas janelas de tamanho $m$ $x$ $m$ e com $m>1$  \cite{martins}. Numerando os pixels de 1 a n chega-se no seguinte conjunto de equações
 \begin{center}
 $I_{x1}V_x+I_{y1}V_y = -I_{t1}$\\
 $I_{x2}V_x+I_{y2}V_y = -I_{t2}$\\
@@ -216,24 +220,22 @@ $A^T A\vec{v}=A^T(-b)$ ou $\vec{v}=(A^TA)A^T(-b)$\\
 
 E então obtemos\\
 
-$\begin{bmatrix} V_x \\ V_y \end{bmatrix}$ = $\begin{bmatrix} \sum I_{xi}^2 & \sum I_{xi}I_{yi} \\ \sum I_{xi}I_{yi} & \sum I_{yi}^2 \end{bmatrix}^{-1} \begin{bmatrix} -\sum I_{xi}I_{ti} \\ \sum I_{yi}I_{ti} \end{bmatrix}$ (http://webserver2.tecgraf.puc-rio.br)
+$\begin{bmatrix} V_x \\ V_y \end{bmatrix}$ = $\begin{bmatrix} \sum I_{xi}^2 & \sum I_{xi}I_{yi} \\ \sum I_{xi}I_{yi} & \sum I_{yi}^2 \end{bmatrix}^{-1} \begin{bmatrix} -\sum I_{xi}I_{ti} \\ \sum I_{yi}I_{ti} \end{bmatrix}$\\
 
 Um exemplo visual é a figura \ref{fig:image}, é passado como parâmetro a imagem 1, imagem 2 e as bordas da imagem 1, o retorno será as bordas da imagem 2.
-
 \begin{figure}[h]
 	\centering
 		\graphicspath{ {image} }		
 		\includegraphics[width=7cm]{images/Warp_Affine_Tutorial_Theory_0.jpg}
 		\caption{Lucas Kanade}
 		\label{fig:image}
-		\cite{harvard} %https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/warp_affine/warp_affine.html
 \end{figure}
-
+\pagebreak
 \begin{itemize}
 \item estimateRigidTransform()
 \end{itemize}
 
-Sendo pré-estabelecido dois vetores de coordenadas de pontos ótimos de borda, essa função retornará um transformação afim, isto é, retornará o deslocamento em $x$, $y$ e o ângulo $\theta$, como mostrado nas matrizes abaixo:
+Sendo pré-estabelecido dois vetores de coordenadas de pontos ótimos de borda, essa função retornará uma transformação afim, isto é, retornará o deslocamento em $x$, $y$ e o ângulo $\theta$, como mostrado nas matrizes abaixo \cite{nghiaho1}:\\
 
 R(rotação)= $\begin{bmatrix}
 cos(\theta) & -\sin(theta) \\ \sin(\theta) & cos(\theta)
@@ -251,12 +253,12 @@ A transformação afim fica
 \begin{center}
 $T = [RS|t] = \begin{bmatrix}s*cos(\theta) & -s*sin(\theta) & tx \\ s*sin(\theta) & s*cos(\theta) & ty\end{bmatrix}$
 \end{center}
-(http://nghiaho.com/?p=2208)
+
 \begin{itemize}
-\item warpAffine()
+\item warpAffine() - \cite{warp}
 \end{itemize}
 
-Basicamente, essa função irá aplicar uma matriz de transformação afim a uma imagem, onde essa transformação afim possuirá deslocamento em \textit{x}, em \textit{y}, o escalonamento e a rotação, como mencionado anteriormente. Essa moficação é realizada na imagem através da seguinte equação: 
+Basicamente, essa função irá aplicar uma matriz de transformação afim a uma imagem, onde essa transformação afim possuirá deslocamento em \textit{x}, em \textit{y}, o escalonamento e a rotação, como mencionado anteriormente. Essa moficação é realizada na imagem através da seguinte equação:\\
 
 $\texttt{dst} (x,y) =  \texttt{src} ( \texttt{M} _{11} x +  \texttt{M} _{12} y +  \texttt{M} _{13}, \texttt{M} _{21} x +  \texttt{M} _{22} y +  \texttt{M} _{23})$\\
 
@@ -270,11 +272,11 @@ Primeiro, há a captura de um frame, chamado de \textit{prev\_image}, e sua conve
 
 \lstinputlisting[language=cpp,caption={Captura do Primeiro Frame}]{code/01.cpp}
 
-Em seguida, o código entra em um loop para o tratamento dos seguintes frames. Calcula-se os pontos de borda for de \textit{prev\_image} (\textit{goodFeaturesToTrack}), o próximo frame é capturado e calculado os correspondentes dos pontos encontrados em \textit{prev\_image} (\textit{calcOpticalFlowPyrLK}). Assim como no primeiro frame, o segundo também é clonado criando a nova imagem \textit{next\_color\_image}.
+Em seguida, o código entra em um loop para o tratamento dos seguintes frames. Calcula-se os pontos de borda forte de \textit{prev\_image} (\textit{goodFeaturesToTrack}), o próximo frame é capturado e calculado os correspondentes dos pontos encontrados em \textit{prev\_image} (\textit{calcOpticalFlowPyrLK}). Assim como no primeiro frame, o segundo também é clonado criando a nova imagem \textit{next\_color\_image}.
 
 \lstinputlisting[language=cpp,caption={Início do Loop}]{code/02.cpp}
 
-Observe que existe um loop percorrendo \textit{status}, isso se dá porque a função \textit{calcOpticalFlowPyrLK} retorna \textit{1} nessa variável caso o ponto de borda tenha sido encontrado em \textit{next\_image}, a função desse for é armazenar apenas os pontos que possuiem correspondentes.
+Observe que existe um loop percorrendo \textit{status} (linha 6), isso se dá porque a função \textit{calcOpticalFlowPyrLK} retorna \textit{1} nessa variável caso o ponto de borda tenha sido encontrado em \textit{next\_image}, a função desse for é armazenar apenas os pontos que possuiem correspondentes.
 
 Agora que temos as posições dos pontos de ambos os frames capturados, será usado \textit{estimateRigidTransform} para encontrar a transformação afim. Pode ocorrer dessa matriz não se encontrada, nesse caso ela é substituída por uma matrix identidade. Além disso, a função \textit{estimateRigidTransform} encontra o deslocamento e a rotação que ocorre do primeiro pro segundo argumento passado, então, pensando na transformação inversa, foi passado os pontos do segundo frame como primeiro argumento, e os pontos do primeiro frame como segundo argumento, perceba:
 
@@ -284,37 +286,47 @@ Caso a matriz de transformação seja encontrada, os valores de deslocamento e rot
 
 \lstinputlisting[language=cpp,caption={Matriz T e Aplicação}]{code/04.cpp}
 
-O trecho acima mostra o cálculo da matriz de transformação com os novos valores acumulados e o uso da função \textit{warpAffine}, a qual modifica a imagem \textit{next\_color\_image}, onde o resultado será retornado em \textit{new\_image}. Ademais, \textit{new\_image} é recortada com o objetivo amenizar o efeito que a estabilização causa nas bordas, além de redimensionada com o tamanho inicial do vídeo.
+O trecho acima mostra o cálculo da matriz de transformação com os novos valores acumulados e o uso da função \textit{warpAffine}, a qual modifica a imagem \textit{next\_color\_image}, onde o resultado será retornado em \textit{new\_image}. Ademais, \textit{new\_image} é recortada com o objetivo de amenizar o efeito que a estabilização causa nas bordas, além de redimensionada com o tamanho inicial do vídeo.
 
-Por fim, o frame resultante é mostrado em uma janela e gravado em um vídeo, segue as especificações do vídeo, as quais são colocadas no início do código:
+\lstinputlisting[language=cpp,caption={Final}]{code/06.cpp}
+
+Por fim, o frame resultante é mostrado em uma janela e gravado em um vídeo, mais a necessidade de limpar os vetores das posições das bordas. Segue as especificações do vídeo, as quais são colocadas no início do código:
 
 \lstinputlisting[language=cpp,caption={Vídeo Acelerado}]{code/05.cpp}
 
-Sendo esse vídeo exibido com 60 frames por segundo.
+Sendo esse vídeo exibido com 60 frames por segundo \cite{nghiaho2}.
 
 \subsection{Resultados}
 
-Para exibição dos resultados, foi utilizado o mecanismo de pintar os pontos encontrados em ambos os frames.\\
+Para exibição dos resultados, foi utilizado o mecanismo de pintar os pontos encontrados em ambos os frames.
+\pagebreak
 
 \begin{figure}[H]
-	\subfloat[][Sem Estabilização]{\includegraphics[scale=0.30]{images/result_1a}\label{fig:res1a}}\\
-     \subfloat[][Com Estabilização]{\includegraphics[scale=0.30]{images/result_1b}\label{fig:res1b}}\\
+	\subfloat[][Sem Estabilização]{\includegraphics[scale=0.28]{images/result_1a}\label{fig:res1a}}\\	
+     \subfloat[][Com Estabilização]{\includegraphics[scale=0.28]{images/result_1b}\label{fig:res1b}}
      \caption{Resultado 01}
      \label{fig:resultado1}
 \end{figure}
-
 \begin{figure}[H]
-	\subfloat[][Sem Estabilização]{\includegraphics[scale=0.30]{images/result_3a}\label{fig:res3a}}\\
-	\subfloat[][Com Estabilização]{\includegraphics[scale=0.30]{images/result_3b}\label{fig:res3b}}\\
+	\subfloat[][Sem Estabilização]{\includegraphics[scale=0.28]{images/result_3a}\label{fig:res3a}}\\
+	\subfloat[][Com Estabilização]{\includegraphics[scale=0.28]{images/result_3b}\label{fig:res3b}}
 	\caption{Resultado 02}
      \label{fig:resultado3}
 \end{figure}
 
-As figuras \ref{fig:resultado1} e \ref{fig:resultado3} mostram duas situação em que a aplicação da transformação afim é bem visível, pois é bastante notório a sobra preta na borda nas imagem estabilizadas.
+As figuras \ref{fig:resultado1} e \ref{fig:resultado3} mostram duas situação em que a aplicação da transformação afim é bem visível, pois é bastante notório a sobra preta na borda das imagem estabilizadas devido ao deslocamento e rotação.
 
 \subsection{Dificuldades}
 
+Pensar em todo os procedimentos e métodos que poderiam ser utilizados nos frames para tratamento da estabilização foi uma das dificuldades, porém, após algumas pesquisas foi possível entrar em um consenso no que poderia ser usado.
+
+Houveram alguns testes, por exemplo, a aplicação de outras funções para se chegar ao valor do deslocamento e rotação da imagem, podendo ser citadas a função \textit{findHomography()} que encontra a transformação de perspectiva entre dois planos, e \textit{warpPerspective()} que aplicaria a transformada encontrada com \textit{findHomography()}. Mas as funções presentes no algoritmo foram as que responderam melhor à intenção do trabalho.
+
+Porém, o probema da movimentação no eixo \textit{z} não foi solucionado, isso ocorre quando a câmera se desloca em direção ao objeto principal da cena ou se distancia. Ao rodar o algoritmo proposto nesse projeto, o resultado do tratamento tem um comportamento inesperado o qual não atende às espectativas.
+
 \subsection{Conclusão}
+
+O algoritmo atendeu bem ao objetivo do trabalho, que no caso é a estabilização e aceleração na visualização dos frames, porém, apenas para um certo tipo de vídeo, o qual a câmera não se movimenta no eixo \textit{z}, ou seja, não se aproxima e não se distancia do foco da imagem. Posteriormente, esse problema pode ser consertado com um estudo mais aprofundado do fluxo óptico.
 
 % BIBLIOGRAFIA
 \bibliography{exemplo}

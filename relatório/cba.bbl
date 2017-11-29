@@ -1,3 +1,60 @@
 \begin{thebibliography}{xx}
 
+\harvarditem{BEZERRA}{2017}{bezerra}
+BEZERRA, R.  \harvardyearleft 2017\harvardyearright .
+\newblock {Hyperlapse você sabe o que é?},
+  \url{http://entrananet.blogspot.com.br/2013/05/hyperlapse-voce-sabe-o-que-e.html}.
+\newblock [Online; acessado 30 Nov 2017].
+
+\harvarditem{BRITO}{2016}{agostinho}
+BRITO, A.  \harvardyearleft 2016\harvardyearright .
+\newblock {Processamento Digital de Imagens - Fluxo Óptico},
+  \url{http://agostinhobritojr.github.io/cursos/pdi/fluxo.pdf}.
+\newblock [Online; acessado 22 Oct 2017].
+
+\harvarditem{FARIA}{n.d.}{faria}
+FARIA, A. W.~C.  \harvardyearleft n.d.\harvardyearright .
+\newblock {Fluxo Óotico},
+  \url{http://homes.dcc.ufba.br/~perfeuge/optical_flow_article.pdf}.
+\newblock [Online; acessado 30 Nov 2017].
+
+\harvarditem{MARTINS}{n.d.}{martins}
+MARTINS, L.  \harvardyearleft n.d.\harvardyearright .
+\newblock {Trabalho Final de Visão Computacional e Realidade Aumentada. Tema:
+  Determinação do Fluxo Óptico em Dados Sísmicos},
+  \url{http://webserver2.tecgraf.puc-rio.br/~mgattass/ra/trb08/LeonardoMartins/trab_final.html#_Método_de_Lucas-Kanade}.
+\newblock [Online; acessado 24 Oct 2017].
+
+\harvarditem{NghiaHo$^1$}{2015}{nghiaho1}
+NghiaHo$^1$  \harvardyearleft 2015\harvardyearright .
+\newblock {Understanding OpenCV CV::estimateRigidTransform},
+  \url{http://nghiaho.com/?p=2208}.
+\newblock [Online; acessado 22 Oct 2017].
+
+\harvarditem{NghiaHo$^2$}{2014}{nghiaho2}
+NghiaHo$^2$  \harvardyearleft 2014\harvardyearright .
+\newblock {Simple Video Stabilization Using OpenCV},
+  \url{http://nghiaho.com/?p=2093}.
+\newblock [Online; acessado 22 Oct 2017].
+
+\harvarditem{OpenCV$^2$}{2017}{harris}
+OpenCV$^2$  \harvardyearleft 2017\harvardyearright .
+\newblock {Harris corner detector},
+  \url{https://docs.opencv.org/2.4/doc/tutorials/features2d/trackingmotion/harris_detector/harris_detector.html}.
+\newblock [Online; acessado 22 Oct 2017].
+
+\harvarditem{OpenCV$^3$}{2017}{warp}
+OpenCV$^3$  \harvardyearleft 2017\harvardyearright .
+\newblock {Affine Transformations},
+  \url{https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/warp_affine/warp_affine.html}.
+\newblock [Online; acessado 22 Oct 2017].
+
+\harvarditem{SARCINELLI \harvardand\ CALDEIRA}{2001}{mario}
+SARCINELLI, Mário Filho;~SCHNEEBELI, H.~A. \harvardand\ CALDEIRA, E. M. d.~O.
+  \harvardyearleft 2001\harvardyearright .
+\newblock {Cálculo do Fluxo Óotico em Tempo Real e sua Utilização na Navegação
+  de Robôs Móveis},
+  \url{http://fei.edu.br/sbai/SBAI2001/vsbai/artigos/1110.pdf}.
+\newblock [Online; acessado 30 Nov 2017].
+
 \end{thebibliography}
